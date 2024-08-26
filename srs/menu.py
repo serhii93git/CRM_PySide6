@@ -21,6 +21,6 @@ def setup_menu(window: QMainWindow):
 def show_about_dialog_window(window):
     about_msg = QMessageBox(window)
     about_msg.setWindowTitle('About App')
-    about_msg.setText('Simple SRM app run on PySide 6 \n Version: 0.0.01/alpha') #  set 'About App' text
+    about_msg.setText('Simple SRM app run on PySide 6\nVersion: 0.0.01/alpha') #  set 'About App' text
     about_msg.setIcon(QMessageBox.Icon.Information) #  set icon for (about-msg) from base lib
     about_msg.exec() #  (about_msg) execution command

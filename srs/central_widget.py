@@ -1,7 +1,8 @@
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QPushButton, QTableWidget,
                                QTableWidgetItem, QLineEdit, QFormLayout, QDialog,
                                QLabel, QDialogButtonBox, QMessageBox, QHBoxLayout)
-
+from db_settings import Customer
+from srs.db_settings import session
 
 
 #  create central widget
@@ -39,6 +40,20 @@ def central_widget_show(window):
 
     layout.addLayout(button_layout) #  init buttons layout
 
+    load_data_from_db(table)
+
+def load_data_from_db(table):
+    customers = session.query(Customer).all()
+    table.setRowCount(0)
+    for customer in customers:
+        row_position = table.rowCount()
+        table.insertRow(row_position)
+        table.setItem(row_position, 0, QTableWidgetItem(str(customer.id)))
+        table.setItem(row_position, 1, QTableWidgetItem(str(customer.name)))
+        table.setItem(row_position, 2, QTableWidgetItem(str(customer.phone)))
+        table.setItem(row_position, 3, QTableWidgetItem(str(customer.address)))
+
+
 #  add dialog window for input new data
 def add_button_dialog_window(window, table):
     dialog = QDialog(window)
@@ -66,6 +81,13 @@ def add_button_dialog_window(window, table):
 
 #  add input data in the table
 def add_row_to_table(dialog, table, id_text, name_text, phone_text, address_text):
+
+    #  add line in to database
+    new_customer = Customer(id=int(id_text), name=name_text, phone=phone_text, address=address_text)
+    session.add(new_customer)
+    session.commit()
+
+    #  add line in to app
     row_position = table.rowCount()
     table.insertRow(row_position)
     table.setItem(row_position, 0, QTableWidgetItem(id_text))
@@ -113,6 +135,15 @@ def edit_dialog_window(window, table):
     dialog.exec()
 
 def edit_table_row(dialog, table, row, id_text, name_text, phone_text, address_text):
+    #  get data from the database to edit
+    customer = session.query(Customer).filter(Customer.id == int(id_text)).first()
+    if customer:
+        customer.name = name_text
+        customer.phone = phone_text
+        customer.address = address_text
+        session.commit()
+
+    #  get data from table to edit
     table.setItem(row, 0, QTableWidgetItem(id_text))
     table.setItem(row, 1, QTableWidgetItem(name_text))
     table.setItem(row, 2, QTableWidgetItem(phone_text))
@@ -126,7 +157,18 @@ def delete_selected_row(window, table):
     if selected_row < 0:
         QMessageBox.warning(window, 'Warning', 'Please, select line to delete')
         return
-    table.removeRow(selected_row)
+
+    #  delete line from database
+    id_item = table.item(selected_row, 0)
+    if id_item:
+        customer_id = int(id_item.text())
+    customer = session.query(Customer).filter(Customer.id == customer_id).first()
+    if customer:
+        session.delete(customer)
+        session.commit()
+        table.removeRow(selected_row)
+    else:
+        QMessageBox.warning(window, 'Error', 'Customer not found in database')
 
 
 

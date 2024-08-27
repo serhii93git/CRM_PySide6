@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QPushButton, QTableWidget,
                                QTableWidgetItem, QLineEdit, QFormLayout, QDialog,
-                               QLabel, QDialogButtonBox, QMessageBox)
+                               QLabel, QDialogButtonBox, QMessageBox, QHBoxLayout)
 
 
 
@@ -20,6 +20,9 @@ def central_widget_show(window):
     layout.addWidget(table) #  add table to layout
 
     #  create buttons
+    button_layout = QHBoxLayout() #  create layout for buttons
+
+
     add_button = QPushButton('Add') # create ADD button
     add_button.clicked.connect(lambda: add_button_dialog_window(window, table)) #  set up func for (add_button) btn
 
@@ -29,10 +32,12 @@ def central_widget_show(window):
     delete_button = QPushButton('Delete')
     delete_button.clicked.connect(lambda: delete_selected_row(window, table))
 
-    #  init buttons
-    layout.addWidget(add_button)
-    layout.addWidget(edit_button)
-    layout.addWidget(delete_button)
+    #  init buttons with (buttons_layout)
+    button_layout.addWidget(add_button)
+    button_layout.addWidget(edit_button)
+    button_layout.addWidget(delete_button)
+
+    layout.addLayout(button_layout) #  init buttons layout
 
 #  add dialog window for input new data
 def add_button_dialog_window(window, table):
